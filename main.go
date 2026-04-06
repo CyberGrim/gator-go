@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"os"
 
 	"github.com/cybergrim/gator-go/internal/config"
 )
@@ -13,12 +13,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cfg.SetUser("Grim")
+	s := &state{Cfg: &cfg}
 
-	cfg, err = config.Read()
-	if err != nil {
-		log.Fatal(err)
+	cmds := commands{Cmd: make(map[string]func(*state, command) error)}
+
+	cmds.register("login", handlerLogin)
+
+	arguments := os.Args
+	if len(arguments) < 2 {
+		log.Fatal("Need to pass a command to run")
 	}
 
-	fmt.Printf("%+v\n", cfg)
+	cmd := command{Name: arguments[1], Arguments: arguments[2:]}
+	err2 := cmds.run(s, cmd)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
 }
