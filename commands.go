@@ -4,9 +4,11 @@ import (
 	"errors"
 
 	"github.com/cybergrim/gator-go/internal/config"
+	"github.com/cybergrim/gator-go/internal/database"
 )
 
 type state struct {
+	db  *database.Queries
 	Cfg *config.Config
 }
 
