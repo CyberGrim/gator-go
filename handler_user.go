@@ -60,3 +60,14 @@ func handlerRegister(s *state, cmd command) error {
 
 	return nil
 }
+
+func handlerReset(s *state, cmd command) error {
+	resetError := s.db.Reset(context.Background())
+	if resetError != nil {
+		return resetError
+	}
+
+	fmt.Printf("The %s database has been reset\n", s.Cfg.DBUrl)
+
+	return nil
+}

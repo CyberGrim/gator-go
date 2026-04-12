@@ -29,6 +29,8 @@ func main() {
 
 	cmds.register("register", handlerRegister)
 
+	cmds.register("reset", handlerReset)
+
 	arguments := os.Args
 	if len(arguments) < 2 {
 		log.Fatal("Need to pass a command to run")
