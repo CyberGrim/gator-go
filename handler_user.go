@@ -89,3 +89,14 @@ func handlerGetUsers(s *state, cmd command) error {
 
 	return nil
 }
+
+func handlerAgg(s *state, cmd command) error {
+	hardcodedURLFeed := "https://www.wagslane.dev/index.xml"
+	feed, feedErr := fetchFeed(context.Background(), hardcodedURLFeed)
+	if feedErr != nil {
+		return feedErr
+	}
+	fmt.Printf("%+v\n", feed)
+
+	return nil
+}
