@@ -100,3 +100,35 @@ func handlerAgg(s *state, cmd command) error {
 
 	return nil
 }
+
+func handlerAddFeed(s *state, cmd command) error {
+	args := cmd.Arguments
+	if len(args) != 2 {
+		return errors.New("Incorrect number of arguments")
+	}
+	name := args[0]
+	url := args[1]
+	currentUser, usrError := s.db.GetUser(context.Background(), s.Cfg.CurrentUserName)
+	if usrError != nil {
+		return usrError
+	}
+
+	feed, feedErr := s.db.CreateFeed(
+		context.Background(),
+		database.CreateFeedParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      name,
+			Url:       url,
+			UserID:    currentUser.ID,
+		},
+	)
+	if feedErr != nil {
+		return feedErr
+	}
+
+	fmt.Println(feed)
+
+	return nil
+}
