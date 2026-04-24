@@ -84,7 +84,6 @@ func handlerGetUsers(s *state, cmd command) error {
 		} else {
 			fmt.Println(allUsers[i].Name)
 		}
-
 	}
 
 	return nil
@@ -128,6 +127,19 @@ func handlerAddFeed(s *state, cmd command) error {
 		return feedErr
 	}
 
+	_, newFeedFollowErr := s.db.CreateFeedFollow(context.Background(),
+		database.CreateFeedFollowParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			UserID:    currentUser.ID,
+			FeedID:    feed.ID,
+		},
+	)
+	if newFeedFollowErr != nil {
+		return newFeedFollowErr
+	}
+
 	fmt.Println(feed)
 
 	return nil
@@ -152,6 +164,63 @@ func handlerGetFeeds(s *state, cmd command) error {
 		fmt.Printf("Feed Name: %s\n", feed.Name)
 		fmt.Printf("Feed URL: %s\n", feed.Url)
 		fmt.Printf("Feed User: %s\n", feedUser.Name)
+	}
+
+	return nil
+}
+
+func handlerFollowFeeds(s *state, cmd command) error {
+	args := cmd.Arguments
+	if len(args) != 1 {
+		return errors.New("This command requires a single argument (URL)")
+	}
+
+	currentUser, usrError := s.db.GetUser(context.Background(), s.Cfg.CurrentUserName)
+	if usrError != nil {
+		return usrError
+	}
+
+	currentFeed, feedError := s.db.GetFeedsByURL(context.Background(), args[0])
+	if feedError != nil {
+		return feedError
+	}
+
+	feeds, getError := s.db.CreateFeedFollow(context.Background(),
+		database.CreateFeedFollowParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			UserID:    currentUser.ID,
+			FeedID:    currentFeed.ID,
+		},
+	)
+	if getError != nil {
+		return getError
+	}
+
+	fmt.Printf("Feed: %s\nUser: %s\n", feeds.FeedName, currentUser.Name)
+
+	return nil
+}
+
+func handlerFollowing(s *state, cmd command) error {
+	args := cmd.Arguments
+	if len(args) != 0 {
+		return errors.New("This command takes no arguments")
+	}
+
+	currentUser, usrError := s.db.GetUser(context.Background(), s.Cfg.CurrentUserName)
+	if usrError != nil {
+		return usrError
+	}
+
+	userFeeds, getError := s.db.GetFeedFollowsForUser(context.Background(), currentUser.ID)
+	if getError != nil {
+		return getError
+	}
+
+	for i := range userFeeds {
+		fmt.Printf("Feed: %s\n", userFeeds[i].FeedName)
 	}
 
 	return nil
