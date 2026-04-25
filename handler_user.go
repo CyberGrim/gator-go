@@ -211,3 +211,27 @@ func handlerFollowing(s *state, cmd command, currentUser database.User) error {
 
 	return nil
 }
+
+func handlerUnfollow(s *state, cmd command, currentUser database.User) error {
+	args := cmd.Arguments
+	if len(args) != 1 {
+		return errors.New("This command takes only one argument, the feed to unfollow")
+	}
+
+	currentFeed, feedError := s.db.GetFeedsByURL(context.Background(), args[0])
+	if feedError != nil {
+		return feedError
+	}
+
+	removeError := s.db.RemoveFeedFollowsForUser(context.Background(),
+		database.RemoveFeedFollowsForUserParams{
+			UserID: currentUser.ID,
+			FeedID: currentFeed.ID,
+		},
+	)
+	if removeError != nil {
+		return removeError
+	}
+
+	return nil
+}
