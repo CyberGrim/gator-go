@@ -100,17 +100,13 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, currentUser database.User) error {
 	args := cmd.Arguments
 	if len(args) != 2 {
 		return errors.New("Incorrect number of arguments")
 	}
 	name := args[0]
 	url := args[1]
-	currentUser, usrError := s.db.GetUser(context.Background(), s.Cfg.CurrentUserName)
-	if usrError != nil {
-		return usrError
-	}
 
 	feed, feedErr := s.db.CreateFeed(
 		context.Background(),
@@ -169,15 +165,10 @@ func handlerGetFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollowFeeds(s *state, cmd command) error {
+func handlerFollowFeeds(s *state, cmd command, currentUser database.User) error {
 	args := cmd.Arguments
 	if len(args) != 1 {
 		return errors.New("This command requires a single argument (URL)")
-	}
-
-	currentUser, usrError := s.db.GetUser(context.Background(), s.Cfg.CurrentUserName)
-	if usrError != nil {
-		return usrError
 	}
 
 	currentFeed, feedError := s.db.GetFeedsByURL(context.Background(), args[0])
@@ -203,15 +194,10 @@ func handlerFollowFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollowing(s *state, cmd command) error {
+func handlerFollowing(s *state, cmd command, currentUser database.User) error {
 	args := cmd.Arguments
 	if len(args) != 0 {
 		return errors.New("This command takes no arguments")
-	}
-
-	currentUser, usrError := s.db.GetUser(context.Background(), s.Cfg.CurrentUserName)
-	if usrError != nil {
-		return usrError
 	}
 
 	userFeeds, getError := s.db.GetFeedFollowsForUser(context.Background(), currentUser.ID)
