@@ -90,12 +90,21 @@ func handlerGetUsers(s *state, cmd command) error {
 }
 
 func handlerAgg(s *state, cmd command) error {
-	hardcodedURLFeed := "https://www.wagslane.dev/index.xml"
-	feed, feedErr := fetchFeed(context.Background(), hardcodedURLFeed)
-	if feedErr != nil {
-		return feedErr
+	args := cmd.Arguments
+	if len(args) != 1 {
+		return errors.New("This command just takes a single argument - time_between_reqs")
 	}
-	fmt.Printf("%+v\n", feed)
+	duration, timerError := time.ParseDuration(args[0])
+	if timerError != nil {
+		return timerError
+	}
+
+	fmt.Printf("Collecting feeds every %s...\n", duration)
+
+	ticker := time.NewTicker(duration)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
 
 	return nil
 }
