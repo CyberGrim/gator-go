@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/cybergrim/gator-go/internal/config"
-	"github.com/cybergrim/gator-go/internal/database"
+	"github.com/cybergrim/gator/internal/config"
+	"github.com/cybergrim/gator/internal/database"
 	_ "github.com/lib/pq"
 )
 
@@ -35,6 +35,7 @@ func main() {
 	cmds.register("follow", middlewareLoggedIn(handlerFollowFeeds))
 	cmds.register("following", middlewareLoggedIn(handlerFollowing))
 	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
+	cmds.register("browse", middlewareLoggedIn(handlerBrowse))
 
 	arguments := os.Args
 	if len(arguments) < 2 {

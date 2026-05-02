@@ -23,6 +23,7 @@ type RSSItem struct {
 	Link        string `xml:"link"`
 	Description string `xml:"description"`
 	PubDate     string `xml:"pubDate"`
+	GUID        string `xml:"guid"`
 }
 
 func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {

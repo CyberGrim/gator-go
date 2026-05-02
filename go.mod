@@ -1,4 +1,4 @@
-module github.com/cybergrim/gator-go
+module github.com/cybergrim/gator
 
 go 1.26.1
 

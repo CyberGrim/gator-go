@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"strconv"
 	"time"
 
-	"github.com/cybergrim/gator-go/internal/database"
+	"github.com/cybergrim/gator/internal/database"
 	"github.com/google/uuid"
 )
 
@@ -240,6 +242,38 @@ func handlerUnfollow(s *state, cmd command, currentUser database.User) error {
 	)
 	if removeError != nil {
 		return removeError
+	}
+
+	return nil
+}
+
+func handlerBrowse(s *state, cmd command, currentUser database.User) error {
+	args := cmd.Arguments
+	limit := 2
+	if len(args) > 1 {
+		return errors.New("This command only zero or one argument. A limit")
+	}
+
+	if len(args) == 1 {
+		var convErr error
+		limit, convErr = strconv.Atoi(args[0])
+		if convErr != nil {
+			return convErr
+		}
+	}
+
+	feedPost, getError := s.db.GetPostsForUser(context.Background(), database.GetPostsForUserParams{
+		UserID: currentUser.ID,
+		Limit:  int32(limit),
+	})
+	log.Printf("Browsing posts for user: %v", currentUser.ID)
+	log.Printf("Posts found: %v", len(feedPost))
+	if getError != nil {
+		return getError
+	}
+
+	for i := range feedPost {
+		fmt.Printf("%s\n", feedPost[i].Title)
 	}
 
 	return nil

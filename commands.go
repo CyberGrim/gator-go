@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 
-	"github.com/cybergrim/gator-go/internal/config"
-	"github.com/cybergrim/gator-go/internal/database"
+	"github.com/cybergrim/gator/internal/config"
+	"github.com/cybergrim/gator/internal/database"
 )
 
 type state struct {
